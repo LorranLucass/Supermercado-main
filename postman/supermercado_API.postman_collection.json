@@ -1,0 +1,1038 @@
+{
+  "info": {
+    "_postman_id": "8f0cf42e-d03f-40f0-b51f-2717b0e9cbb7",
+    "name": "Supermercado API CRUD Tests",
+    "description": "# 🚀 Testes CRUD para API Supermercado\n\nEsta coleção testa as operações CRUD (GET, POST, PUT, DELETE) para os recursos Produtos, Clientes, Fornecedores, Pedidos e Categorias da API Supermercado rodando em http://localhost:3000.\n\n## 🔖 **Como usar esta coleção**\n\n1. **Configure a variável `base_url`**: Certifique-se de que `base_url` está definida como `http://localhost:3000`.\n2. **Execute as requisições**: Abra cada pasta (Produtos, Clientes, etc.) e envie as requisições na ordem: POST, GET, PUT, DELETE.\n3. **Verifique os testes**: Cada requisição tem scripts de teste para validar status codes e respostas.\n4. **Ajuste IDs dinâmicos**: Para Produtos e Pedidos, use IDs reais obtidos via GET, pois os IDs são gerados dinamicamente.\n\n## 💪 Dicas\n\n- Use `GET /recurso` para listar IDs disponíveis antes de testar PUT ou DELETE.\n- Verifique os logs do servidor para erros, especialmente em Categorias.\n- Persista dados com um arquivo JSON ou banco de dados para evitar perda ao reiniciar o servidor.\n\n## ⚠️ Notas\n\n- Para Categorias, corrija o erro `TypeError: Cannot destructure property 'nome' of 'req.body' as it is undefined` garantindo que `Content-Type: application/json` está no header e o corpo JSON está correto.\n- IDs de produtos e pedidos são gerados dinamicamente (`String(Date.now())`). Atualize as variáveis `produto_id`, `pedido_id`, etc., após criar recursos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37882780"
+  },
+  "item": [
+    {
+      "name": "Produtos",
+      "item": [
+        {
+          "name": "GET - Listar todos os produtos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is an array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/produtos",
+              "host": ["{{base_url}}"],
+              "path": ["produtos"]
+            },
+            "description": "Lista todos os produtos."
+          },
+          "response": []
+        },
+        {
+          "name": "GET - Buscar produto por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 404\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "pm.test(\"Response has expected fields if 200\", function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('id');",
+                  "        pm.expect(jsonData).to.have.property('nome');",
+                  "        pm.expect(jsonData).to.have.property('preco');",
+                  "        pm.expect(jsonData).to.have.property('estoque');",
+                  "        pm.expect(jsonData).to.have.property('categoria');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/produtos/{{produto_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["produtos", "{{produto_id}}"]
+            },
+            "description": "Busca um produto por ID. Substitua `produto_id` pelo ID real obtido via GET /produtos."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - Cadastrar produto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 409]);",
+                  "});",
+                  "pm.test(\"Response has message and produto\", function () {",
+                  "    if (pm.response.code === 201) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('message', 'Produto cadastrado com sucesso!');",
+                  "        pm.expect(jsonData).to.have.property('produto');",
+                  "        pm.expect(jsonData.produto).to.have.property('id');",
+                  "        pm.expect(jsonData.produto).to.have.property('nome', 'Farinha de Trigo 1kg');",
+                  "        pm.setEnvironmentVariable('produto_id', jsonData.produto.id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Farinha de Trigo 1kg\",\n  \"preco\": 5.99,\n  \"estoque\": 180,\n  \"categoria\": \"Alimentos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/produtos",
+              "host": ["{{base_url}}"],
+              "path": ["produtos"]
+            },
+            "description": "Cadastra um novo produto."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT - Atualizar produto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 404]);",
+                  "});",
+                  "pm.test(\"Response has message and produto\", function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('message', 'Produto atualizado com sucesso!');",
+                  "        pm.expect(jsonData).to.have.property('produto');",
+                  "        pm.expect(jsonData.produto).to.have.property('id', pm.environment.get('produto_id'));",
+                  "        pm.expect(jsonData.produto).to.have.property('nome', 'Farinha de Trigo 2kg');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Farinha de Trigo 2kg\",\n  \"preco\": 6.99,\n  \"estoque\": 200,\n  \"categoria\": \"Alimentos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/produtos/{{produto_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["produtos", "{{produto_id}}"]
+            },
+            "description": "Atualiza um produto existente. Use o `produto_id` salvo pelo POST."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE - Remover produto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([204, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/produtos/{{produto_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["produtos", "{{produto_id}}"]
+            },
+            "description": "Remove um produto. Use o `produto_id` salvo pelo POST."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "GET - Listar todos os clientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is an array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": ["{{base_url}}"],
+              "path": ["clientes"]
+            },
+            "description": "Lista todos os clientes."
+          },
+          "response": []
+        },
+        {
+          "name": "GET - Buscar cliente por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 404\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "pm.test(\"Response has expected fields if 200\", function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('id');",
+                  "        pm.expect(jsonData).to.have.property('nome');",
+                  "        pm.expect(jsonData).to.have.property('cpf');",
+                  "        pm.expect(jsonData).to.have.property('telefone');",
+                  "        pm.expect(jsonData).to.have.property('email');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/{{cliente_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["clientes", "{{cliente_id}}"]
+            },
+            "description": "Busca um cliente por ID. Substitua `cliente_id` pelo ID real."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - Cadastrar cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 409]);",
+                  "});",
+                  "pm.test(\"Response has message and cliente\", function () {",
+                  "    if (pm.response.code === 201) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('message');",
+                  "        pm.expect(jsonData).to.have.property('cliente');",
+                  "        pm.expect(jsonData.cliente).to.have.property('id');",
+                  "        pm.expect(jsonData.cliente).to.have.property('nome', 'Sofia Ribeiro');",
+                  "        pm.setEnvironmentVariable('cliente_id', jsonData.cliente.id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"11\",\n  \"nome\": \"Sofia Ribeiro\",\n  \"cpf\": \"15975348624\",\n  \"telefone\": \"61987654321\",\n  \"email\": \"sofia.ribeiro@email.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": ["{{base_url}}"],
+              "path": ["clientes"]
+            },
+            "description": "Cadastra um novo cliente."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT - Atualizar cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 404]);",
+                  "});",
+                  "pm.test(\"Response has message and cliente\", function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('message');",
+                  "        pm.expect(jsonData).to.have.property('cliente');",
+                  "        pm.expect(jsonData.cliente).to.have.property('id', pm.environment.get('cliente_id'));",
+                  "        pm.expect(jsonData.cliente).to.have.property('nome', 'Sofia Ribeiro Atualizada');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{cliente_id}}\",\n  \"nome\": \"Sofia Ribeiro Atualizada\",\n  \"cpf\": \"15975348624\",\n  \"telefone\": \"61987654321\",\n  \"email\": \"sofia.ribeiro.atualizada@email.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/clientes/{{cliente_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["clientes", "{{cliente_id}}"]
+            },
+            "description": "Atualiza um cliente existente. Use o `cliente_id` salvo pelo POST."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE - Remover cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([204, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/{{cliente_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["clientes", "{{cliente_id}}"]
+            },
+            "description": "Remove um cliente. Use o `cliente_id` salvo pelo POST."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Fornecedores",
+      "item": [
+        {
+          "name": "GET - Listar todos os fornecedores",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is an array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/fornecedores",
+              "host": ["{{base_url}}"],
+              "path": ["fornecedores"]
+            },
+            "description": "Lista todos os fornecedores."
+          },
+          "response": []
+        },
+        {
+          "name": "GET - Buscar fornecedor por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 404\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "pm.test(\"Response has expected fields if 200\", function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('id');",
+                  "        pm.expect(jsonData).to.have.property('nome');",
+                  "        pm.expect(jsonData).to.have.property('cnpj');",
+                  "        pm.expect(jsonData).to.have.property('contato');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/fornecedores/{{fornecedor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["fornecedores", "{{fornecedor_id}}"]
+            },
+            "description": "Busca um fornecedor por ID. Substitua `fornecedor_id` pelo ID real."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - Cadastrar fornecedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 409]);",
+                  "});",
+                  "pm.test(\"Response has message and fornecedor\", function () {",
+                  "    if (pm.response.code === 201) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('message', 'Fornecedor cadastrado com sucesso!');",
+                  "        pm.expect(jsonData).to.have.property('fornecedor');",
+                  "        pm.expect(jsonData.fornecedor).to.have.property('id');",
+                  "        pm.expect(jsonData.fornecedor).to.have.property('nome', 'Distribuidora Bebidas XYZ');",
+                  "        pm.setEnvironmentVariable('fornecedor_id', jsonData.fornecedor.id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Distribuidora Bebidas XYZ\",\n  \"cnpj\": \"11122233344455\",\n  \"contato\": \"61977776666\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/fornecedores",
+              "host": ["{{base_url}}"],
+              "path": ["fornecedores"]
+            },
+            "description": "Cadastra um novo fornecedor."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT - Atualizar fornecedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 404]);",
+                  "});",
+                  "pm.test(\"Response has message and fornecedor\", function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('message', 'Fornecedor atualizado com sucesso!');",
+                  "        pm.expect(jsonData).to.have.property('fornecedor');",
+                  "        pm.expect(jsonData.fornecedor).to.have.property('id', pm.environment.get('fornecedor_id'));",
+                  "        pm.expect(jsonData.fornecedor).to.have.property('nome', 'Distribuidora Bebidas XYZ Atualizada');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Distribuidora Bebidas XYZ Atualizada\",\n  \"cnpj\": \"11122233344455\",\n  \"contato\": \"61977776666\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/fornecedores/{{fornecedor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["fornecedores", "{{fornecedor_id}}"]
+            },
+            "description": "Atualiza um fornecedor existente. Use o `fornecedor_id` salvo pelo POST."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE - Remover fornecedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([204, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/fornecedores/{{fornecedor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["fornecedores", "{{fornecedor_id}}"]
+            },
+            "description": "Remove um fornecedor. Use o `fornecedor_id` salvo pelo POST."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pedidos",
+      "item": [
+        {
+          "name": "GET - Listar todos os pedidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is an array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": ["{{base_url}}"],
+              "path": ["pedidos"]
+            },
+            "description": "Lista todos os pedidos."
+          },
+          "response": []
+        },
+        {
+          "name": "GET - Buscar pedido por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 404\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "pm.test(\"Response has expected fields if 200\", function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('id');",
+                  "        pm.expect(jsonData).to.have.property('clienteId');",
+                  "        pm.expect(jsonData).to.have.property('itens');",
+                  "        pm.expect(jsonData).to.have.property('valorTotal');",
+                  "        pm.expect(jsonData).to.have.property('data');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{pedido_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["pedidos", "{{pedido_id}}"]
+            },
+            "description": "Busca um pedido por ID. Substitua `pedido_id` pelo ID real."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - Cadastrar pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 404]);",
+                  "});",
+                  "pm.test(\"Response has message and pedido\", function () {",
+                  "    if (pm.response.code === 201) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('message', 'Pedido cadastrado com sucesso!');",
+                  "        pm.expect(jsonData).to.have.property('pedido');",
+                  "        pm.expect(jsonData.pedido).to.have.property('id');",
+                  "        pm.expect(jsonData.pedido).to.have.property('clienteId', '3');",
+                  "        pm.setEnvironmentVariable('pedido_id', jsonData.pedido.id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"3\",\n  \"itens\": [\n    {\n      \"produtoId\": \"301\",\n      \"quantidade\": 2\n    },\n    {\n      \"produtoId\": \"302\",\n      \"quantidade\": 3\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": ["{{base_url}}"],
+              "path": ["pedidos"]
+            },
+            "description": "Cadastra um novo pedido. Certifique-se de que os `produtoId` existem (use GET /produtos para obter IDs)."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT - Atualizar pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 404]);",
+                  "});",
+                  "pm.test(\"Response has message and pedido\", function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('message', 'Pedido atualizado com sucesso!');",
+                  "        pm.expect(jsonData).to.have.property('pedido');",
+                  "        pm.expect(jsonData.pedido).to.have.property('id', pm.environment.get('pedido_id'));",
+                  "        pm.expect(jsonData.pedido).to.have.property('clienteId', '4');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"4\",\n  \"itens\": [\n    {\n      \"produtoId\": \"301\",\n      \"quantidade\": 1\n    },\n    {\n      \"produtoId\": \"302\",\n      \"quantidade\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{pedido_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["pedidos", "{{pedido_id}}"]
+            },
+            "description": "Atualiza um pedido existente. Use o `pedido_id` salvo pelo POST."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE - Remover pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([204, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{pedido_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["pedidos", "{{pedido_id}}"]
+            },
+            "description": "Remove um pedido. Use o `pedido_id` salvo pelo POST."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Categorias",
+      "item": [
+        {
+          "name": "GET - Listar todas as categorias",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200]);",
+                  "});",
+                  "pm.test(\"Response is an array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/categorias",
+              "host": ["{{base_url}}"],
+              "path": ["categorias"]
+            },
+            "description": "Lista todas as categorias."
+          },
+          "response": []
+        },
+        {
+          "name": "GET - Buscar categoria por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 404\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "pm.test(\"Response has expected fields if 200\", function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('id');",
+                  "        pm.expect(jsonData).to.have.property('nome');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/categorias/{{categoria_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["categorias", "{{categoria_id}}"]
+            },
+            "description": "Busca uma categoria por ID. Substitua `categoria_id` pelo ID real."
+          },
+          "response": []
+        },
+        {
+          "name": "POST - Cadastrar categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 409]);",
+                  "});",
+                  "pm.test(\"Response has message and categoria\", function () {",
+                  "    if (pm.response.code === 201) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('message', 'Categoria cadastrada com sucesso!');",
+                  "        pm.expect(jsonData).to.have.property('categoria');",
+                  "        pm.expect(jsonData.categoria).to.have.property('id');",
+                  "        pm.expect(jsonData.categoria).to.have.property('nome', 'Bebidas');",
+                  "        pm.setEnvironmentVariable('categoria_id', jsonData.categoria.id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Bebidas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/categorias",
+              "host": ["{{base_url}}"],
+              "path": ["categorias"]
+            },
+            "description": "Cadastra uma nova categoria. Certifique-se de que o header `Content-Type: application/json` está definido."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT - Atualizar categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 404]);",
+                  "});",
+                  "pm.test(\"Response has message and categoria\", function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('message');",
+                  "        pm.expect(jsonData).to.have.property('categoria');",
+                  "        pm.expect(jsonData.categoria).to.have.property('id', pm.environment.get('categoria_id'));",
+                  "        pm.expect(jsonData.categoria).to.have.property('nome', 'Bebidas Atualizada');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Bebidas Atualizada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/categorias/{{categoria_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["categorias", "{{categoria_id}}"]
+            },
+            "description": "Atualiza uma categoria existente. Use o `categoria_id` salvo pelo POST."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE - Remover categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([204, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/categorias/{{categoria_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["categorias", "{{categoria_id}}"]
+            },
+            "description": "Remove uma categoria. Use o `categoria_id` salvo pelo POST."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "produto_id",
+      "value": "301"
+    },
+    {
+      "key": "cliente_id",
+      "value": "11"
+    },
+    {
+      "key": "fornecedor_id",
+      "value": "301"
+    },
+    {
+      "key": "pedido_id",
+      "value": ""
+    },
+    {
+      "key": "categoria_id",
+      "value": ""
+    }
+  ]
+}
