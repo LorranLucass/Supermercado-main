@@ -18,7 +18,7 @@ let ListaDeProdutos = [
   },
 ];
 
-// POST - cadastrar produto
+// POST - cadastrar produto.
 router.post("/produtos", (req, res) => {
   const { nome, preco, estoque, categoria } = req.body;
 
@@ -49,12 +49,12 @@ router.post("/produtos", (req, res) => {
   res.status(201).json({ message: "Produto cadastrado com sucesso!", produto: novoProduto });
 });
 
-// GET - listar todos
+// GET - listar todos.
 router.get("/produtos", (req, res) => {
   res.status(200).json(ListaDeProdutos);
 });
 
-// GET - buscar por ID
+// GET - buscar por ID.
 router.get("/produtos/:id", (req, res) => {
   const { id } = req.params;
   const produto = ListaDeProdutos.find((p) => p.id === id);
@@ -66,7 +66,7 @@ router.get("/produtos/:id", (req, res) => {
   res.status(200).json(produto);
 });
 
-// PUT - atualizar
+// PUT - atualizar.
 router.put("/produtos/:id", (req, res) => {
   const { id } = req.params;
   const { nome, preco, estoque, categoria } = req.body;
@@ -88,7 +88,7 @@ router.put("/produtos/:id", (req, res) => {
   res.status(200).json({ message: "Produto atualizado com sucesso!", produto: produtoAtualizado });
 });
 
-// DELETE - remover
+// DELETE - remover.
 router.delete("/produtos/:id", (req, res) => {
   const { id } = req.params;
 

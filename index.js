@@ -5,14 +5,14 @@ const PORT = 3000;
 // Middleware para receber JSON no body
 app.use(express.json());
 
-// Importando rotas (corrigido o caminho)
+// Importando rotas 
 const { produtosRouter } = require("./routes/produtos");
 const clientesRouter = require("./routes/clientes");
 const fornecedoresRouter = require("./routes/fornecedores");
 const pedidosRouter = require("./routes/pedidos");
 const categoriasRouter = require("./routes/categorias");
 
-// Usando as rotas
+// Rotas
 app.use(produtosRouter);
 app.use(clientesRouter);
 app.use(fornecedoresRouter);
