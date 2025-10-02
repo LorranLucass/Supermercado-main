@@ -4,7 +4,9 @@ const { ListaDeProdutos } = require("./produtos");
 
 let ListaDePedidos = [];
 
-// POST
+// Post
+
+
 router.post("/pedidos", (req, res) => {
   const { clienteId, itens } = req.body;
 
@@ -12,7 +14,7 @@ router.post("/pedidos", (req, res) => {
     return res.status(400).json({ error: "clienteId e itens são obrigatórios!" });
   }
 
-  let valorTotal = 0;
+        let valorTotal = 0;
   for (const item of itens) {
     const produto = ListaDeProdutos.find((p) => p.id === item.produtoId);
     if (!produto) {
@@ -33,12 +35,13 @@ router.post("/pedidos", (req, res) => {
   res.status(201).json({ message: "Pedido cadastrado com sucesso!", pedido: novoPedido });
 });
 
-// GET todos os pedidos
+// GET  de todos os pedidos
+
 router.get("/pedidos", (req, res) => {
   res.status(200).json(ListaDePedidos);
 });
 
-// GET pedido por ID
+// GET pedido por ID.
 router.get("/pedidos/:id", (req, res) => {
   const pedido = ListaDePedidos.find((p) => p.id === req.params.id);
   if (!pedido) {
@@ -47,7 +50,7 @@ router.get("/pedidos/:id", (req, res) => {
   res.status(200).json(pedido);
 });
 
-// PUT - atualizar pedido
+// PUT - atualizar pedido.
 router.put("/pedidos/:id", (req, res) => {
   const { clienteId, itens } = req.body;
 
@@ -81,7 +84,7 @@ router.put("/pedidos/:id", (req, res) => {
   res.status(200).json({ message: "Pedido atualizado com sucesso!", pedido: atualizado });
 });
 
-// DELETE
+// Delete
 router.delete("/pedidos/:id", (req, res) => {
   const index = ListaDePedidos.findIndex((p) => p.id === req.params.id);
   if (index === -1) {
@@ -92,5 +95,5 @@ router.delete("/pedidos/:id", (req, res) => {
   res.status(204).send();
 });
 
-// Exportação correta
+// Exportação correta.
 module.exports = router;
