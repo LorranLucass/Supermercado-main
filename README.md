@@ -149,7 +149,7 @@ Git (opcional, para controle de versão)
 
 Instalação
 
-Clone o repositório:git clone <URL_DO_REPOSITORIO>
+Clone o repositório:git clone (https://github.com/LorranLucass/Supermercado-main)
 cd Supermercado
 
 
