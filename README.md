@@ -1,7 +1,3 @@
-O README que você forneceu está bastante completo e bem estruturado! No entanto, podemos aprimorá-lo para torná-lo mais visual, direto e profissional usando uma formatação Markdown mais rica e reorganizando algumas seções para um fluxo de leitura mais intuitivo.
-
-Aqui está a versão revisada:
-
 🛍️ Supermercado API
 Uma API RESTful robusta para gerenciamento completo de um sistema de supermercado, desenvolvida em Node.js e Express. Esta API suporta operações CRUD (Create, Read, Update, Delete) para os recursos essenciais: produtos, clientes, fornecedores, pedidos e categorias.
 
