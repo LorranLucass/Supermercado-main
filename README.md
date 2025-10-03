@@ -11,10 +11,10 @@ Garantir que a API seja fácil de usar e extensível.
 
 👥 Participantes
 
-Lorran Lucas
-Victor Henrique
-Lucas Lopes
-Igor Marques
+Lorran Lucas,
+Victor Henrique,
+Lucas Lopes,
+Igor Marques,
 
 🛠️ Tecnologias Utilizadas
 
@@ -189,30 +189,6 @@ Pedidos com clienteId de clientes existentes e itens contendo produtos como Arro
 
 Categorias:
 Bebidas, Higiene Pessoal.
-
-
-
-🐞 Resolução de Problemas
-
-Erro TypeError: Cannot destructure property 'nome' of 'req.body' as it is undefined em categorias.js:
-
-Causa: Falta do header Content-Type: application/json ou corpo JSON incorreto no Postman.
-Solução:
-No Postman, configure o header Content-Type: application/json.
-Envie o corpo JSON corretamente (ex: {"nome": "Bebidas"}).
-Verifique o código de categorias.js e adicione logs:console.log('Corpo recebido:', req.body);
-
-
-Confirme que app.use(express.json()) está no app.js.
-
-
-
-
-Dados perdidos ao reiniciar o servidor:
-
-Os dados são armazenados em memória. Para persistência, implemente salvamento em um arquivo JSON ou banco de dados como SQLite.
-
-
 
 🔧 Melhorias Futuras
 
